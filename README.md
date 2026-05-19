@@ -100,20 +100,37 @@ You do **not** need an API key to experience Chrona's full capabilities! If no k
 ### 🐳 Option A: Docker (Recommended)
 You can run Chrona entirely inside a Docker container without installing any local Python dependencies.
 
-1. **Build the Docker Image:**
+1. **(Optional) Setup API Keys:**
+   If you want to use live generative AI instead of the high-fidelity offline simulation:
+   ```bash
+   cp .env.example .env
+   # Open .env and add your credentials (e.g. GROQ_API_KEY)
+   ```
+
+2. **Build the Docker Image:**
    ```bash
    docker build -t chrona .
    ```
 
-2. **Run the Interactive Demo:**
-   ```bash
-   docker run -it chrona demo
-   ```
+3. **Run the Interactive Demo:**
+   * **With API Keys:**
+     ```bash
+     docker run -it --env-file .env chrona demo
+     ```
+   * **Offline / Simulation Mode:**
+     ```bash
+     docker run -it chrona demo
+     ```
 
-3. **Ask custom incident queries:**
-   ```bash
-   docker run -it chrona ask "redis connection pool timeout in checkoutservice"
-   ```
+4. **Ask custom incident queries:**
+   * **With API Keys:**
+     ```bash
+     docker run -it --env-file .env chrona ask "redis connection pool timeout in checkoutservice"
+     ```
+   * **Offline / Simulation Mode:**
+     ```bash
+     docker run -it chrona ask "redis connection pool timeout in checkoutservice"
+     ```
 
 ---
 
