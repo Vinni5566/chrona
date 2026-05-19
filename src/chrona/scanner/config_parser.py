@@ -3,6 +3,19 @@ class ConfigParser:
     def parse_docker_compose(file_path: str) -> list[str]:
         services = []
         try:
+            import yaml
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                if isinstance(data, dict) and "services" in data and isinstance(data["services"], dict):
+                    for svc_name in data["services"].keys():
+                        if svc_name and isinstance(svc_name, str):
+                            services.append(svc_name)
+                    return services
+        except Exception:
+            pass
+
+        # Robust regex-based / line-based fallback in case of parsing errors or non-standard formats
+        try:
             with open(file_path, "r", encoding="utf-8") as f:
                 lines = f.readlines()
                 in_services = False

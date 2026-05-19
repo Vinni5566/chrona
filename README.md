@@ -1,21 +1,26 @@
 # Chrona ⏳
 
-> **An incident memory and RCA reasoning tool.**
+> **An Incident Memory and Root Cause Analysis (RCA) Reasoning Tool.**
 
 📺 **[Watch the 2-Minute Demo Video Here](https://youtube.com/your-video-link)**
 
-Chrona bridges the gap between historical operations data and real-time LLM reasoning. By building a temporal, graph-based index of your infrastructure, it prevents AI agents from making "stale" recommendations based on deprecated architectures and instantly surfaces the causal dependencies behind incidents.
+Chrona bridges the gap between historical operations data and real-time LLM reasoning. By building a temporal, graph-based index of your infrastructure, it prevents AI agents from making "stale" recommendations based on deprecated architectures and instantly surfaces the causal dependencies behind active incidents.
+
+---
 
 ## 🌟 Why Chrona?
 
-Current GenAI DevOps agents often suffer from **Temporal Hallucination**. 
-If your database migrated from standalone to cluster 3 months ago, a standard RAG system might still pull up a 6-month-old runbook and suggest deprecated configurations, causing further downtime during a critical incident.
+Current GenAI SRE/DevOps agents suffer heavily from **Temporal Hallucination**. 
+If your database migrated from standalone to a cluster 3 months ago, a standard RAG system might still pull up a 6-month-old runbook and suggest deprecated configurations, causing further downtime during a critical incident.
 
 **Chrona solves this by implementing:**
-1. **Repository-Aware Infrastructure Graphs:** Automatically builds a dependency graph directly from your Kubernetes and Docker manifests.
-2. **Temporal Decay Engine:** Algorithmically decays the confidence score of historical incident memories based on how much the underlying infrastructure has changed since the memory was formed.
-3. **Hybrid Retrieval:** Queries aren't just semantic. Chrona traverses the causal infrastructure graph to find related dependencies.
-4. **Agentic LLM RCA:** Pipes the sanitized, temporally-weighted context into a fast LLM (like Llama 3 via Groq) to generate Root Cause Analysis (RCA).
+1. **Repository-Aware Infrastructure Graphs:** Automatically maps dependency topologies directly from your Kubernetes manifests and Docker Compose configurations using safe AST-aware loaders.
+2. **Temporal Decay Engine:** Algorithmically decays the confidence score of historical incident memories based on how much the underlying infrastructure has changed since the incident occurred.
+3. **Triple-Tier Hybrid Vector Store:** Pluggable semantic retrieval. Leverages OpenAI Cloud Embeddings, local `sentence-transformers` models, or a zero-dependency local TF-IDF backup.
+4. **Dynamic Cascadeflow Router:** Uses a weighted heuristic decision engine (evaluating severity, task complexity, confidence, and tokens) with built-in API cost estimators.
+5. **Zero-Dependency High-Fidelity Simulation:** Built-in offline SRE heuristic simulation that generates realistic root cause analyses even if API keys are missing.
+
+---
 
 ## 🏗 Architecture
 
@@ -43,123 +48,176 @@ graph TD
     H -->|RCA & Action Plan| I[CLI Output / Dashboard]
 ```
 
-## ⚙️ Environment Setup (`.env`)
+---
 
-Before running Chrona, you need to set up your `.env` file. Create a `.env` file in the root directory:
+## 🛠️ Tech Stack
 
-```env
-# Hindsight Platform (For remote tracing & logging)
-HINDSIGHT_API_KEY=hsk_d509...
-HINDSIGHT_PROJECT_ID=chrona5566
-HINDSIGHT_BASE_URL=https://api.hindsight.vectorize.io
+* **Core Runtime:** Python 3.10+ (Scalable, typed asynchronous logic)
 
-# Storage & Database Provider
-CHRONA_STORAGE_MODE=local
-CHRONA_DATA_DIR=./data
-VECTOR_STORE_PROVIDER=local
+* **Graph Processing:** NetworkX (Topology mapping & shortest path traversals)
 
-# LLM Keys & Connections (Set whichever is applicable)
-GROQ_API_KEY=gsk_your_groq_api_key
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-OLLAMA_BASE_URL=http://localhost:11434
+* **Semantic Search:** Scikit-Learn (Local TF-IDF) & OpenAI Cloud Embeddings
 
-# Cascadeflow Router Settings
-CASCADEFLOW_ENABLED=true
-CASCADEFLOW_DEFAULT_MODEL=qwen/qwen3-32b
-CASCADEFLOW_FALLBACK_MODEL=openai/gpt-oss-120b
+* **Graph Visualizations:** PyVis (Interactive physics-based HTML networks)
 
-# Security & Runtime Limits
-CHRONA_ENABLE_SANITIZATION=true
-CHRONA_MASK_SECRETS=true
-CHRONA_MAX_CONTEXT_TOKENS=12000
-CHRONA_MAX_FILE_SIZE_MB=5
-CHRONA_ENABLE_AUDIT_LOGS=true
-CHRONA_DISABLE_RAW_LOG_EXPORT=true
-CHRONA_DEBUG=true
+* **Model Validation:** Pydantic v2 (Strict data schemas & settings)
+
+* **CLI Experience:** Typer & Rich (Visual, production-grade SRE terminals)
+
+---
+
+## 📂 Project Structure
+
+```text
+chrona/
+├── data/               # Graph database and cached incident memories
+│
+├── src/chrona/         # Main application source
+│   ├── cli/            # Rich-Typer SRE terminal commands
+│   ├── config/         # System settings and global environment configuration
+│   ├── graph/          # NetworkX building and interactive visual generators
+│   ├── intelligence/   # Local simulators, confidence scorers, and log sanitizers
+│   ├── llm/            # Generative API clients and keyless heuristic engines
+│   ├── memory/         # Vector stores and remote telemetry collectors
+│   ├── retrieval/      # Hybrid retrieval flow and graph path traversers
+│   ├── routing/        # Cascadeflow dynamic heuristic model routing
+│   ├── schemas/        # Pydantic validation contracts
+│   └── services/       # Core orchestrators and replay services
+│
+└── tests/              # 12-suite pytest coverage framework
 ```
 
-## 🚀 Quickstart
+---
 
-### Option A: Docker (Recommended)
-You can build and run Chrona entirely in Docker without installing any Python dependencies locally.
+## 🚀 Instant Setup & Zero-Key Demo (Under 1 Minute!)
 
-1. **Build the image:**
+You do **not** need an API key to experience Chrona's full capabilities! If no keys are configured, the CLI will automatically activate its **High-Fidelity Local Simulation Engine** to show a highly realistic offline interactive demo.
+
+### 🐳 Option A: Docker (Recommended)
+You can run Chrona entirely inside a Docker container without installing any local Python dependencies.
+
+1. **Build the Docker Image:**
+   ```bash
+   docker build -t chrona .
+   ```
+
+2. **Run the Interactive Demo:**
+   ```bash
+   docker run -it chrona demo
+   ```
+
+3. **Ask custom incident queries:**
+   ```bash
+   docker run -it chrona ask "redis connection pool timeout in checkoutservice"
+   ```
+
+---
+
+### 🐍 Option B: Local Python Installation
+If you prefer running Chrona directly on your host machine:
+
+1. **Clone and Install Dependencies:**
+   ```bash
+   # Create and activate a virtualenv (optional but recommended)
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   
+   # Install dependencies
+   pip install -e .
+   ```
+
+2. **Run the Interactive Demo:**
+   ```bash
+   python -m chrona.cli.commands demo
+   ```
+
+3. **Ask custom incident queries:**
+   ```bash
+   python -m chrona.cli.commands ask "checkout payment gateway timeout"
+   ```
+
+---
+
+## ⚙️ Environment Setup
+
+To connect Chrona to live generative LLMs (like Groq or OpenAI) and enable cloud tracing, create a `.env` file in the project root by copying the provided template:
+
 ```bash
-docker build -t chrona .
+# Copy the example environment template
+cp .env.example .env
 ```
 
-2. **Run Chrona on your own repository:**
-Mount your local repository into the Docker container to scan it. Replace `<path-to-your-repo>` with the absolute path to the codebase you want to scan.
+Open `.env` and set your API keys (e.g. `GROQ_API_KEY` for live generative reasoning or `OPENAI_API_KEY` for vector embeddings). All settings are pre-configured to run out-of-the-box!
+
+To run with your `.env` file in Docker:
 ```bash
-docker run -it --env-file .env -v "<path-to-your-repo>:/workspace/target-repo" chrona scan /workspace/target-repo
+docker run -it --env-file .env -v "$(pwd):/workspace" chrona demo
 ```
 
-3. **Ask an incident query:**
+---
+
+## 🛠️ Complete CLI Command Reference
+
+Once installed, use the following commands to scan codebases and analyze incidents:
+
+### 1. Scan a Target Codebase
+Point the scanner to any local directory. It will scan for Kubernetes `.yaml` files, `docker-compose.yml`, `package.json`, and `requirements.txt` to index dependencies and infrastructure topology.
 ```bash
-docker run -it --env-file .env -v "<path-to-your-repo>:/workspace/target-repo" chrona ask "database connection timeout"
+python -m chrona.cli.commands scan <path-to-your-target-repo>
 ```
 
-### Option B: Local Python Install
-If you prefer running it locally via Python 3.10+:
-
-1. **Install Dependencies:**
+### 2. Analyze an Active Incident
+Retrieve historical incident memories, apply temporal decay penalties, query the topology graph for causal routes, and generate SRE root cause analyses.
 ```bash
-pip install -r requirements.txt
+python -m chrona.cli.commands ask "database write latency spike upstream"
 ```
 
-2. **Scan your repository:**
-Point Chrona to your target repository folder.
+### 3. Visualize a Dependency Path
+If Chrona detects a causal topology route between two services, generate and view an interactive, physics-based NetworkX HTML visualization locally.
 ```bash
-python -m chrona.cli.commands scan <path-to-your-repo>
+python -m chrona.cli.commands graph-path source-service target-service --visualize
 ```
 
-3. **Ask for RCA:**
-Query a live incident to get graph-backed, temporally-scored Root Cause Analysis.
+### 4. Inspect Model Routing Statistics
+Display audit statistics detailing Cascadeflow Router savings, model usage frequencies, and total estimated tokens.
 ```bash
-python -m chrona.cli.commands ask "API gateway is returning 502 bad gateway"
+python -m chrona.cli.commands route-stats
 ```
 
-## 🛠 Core Commands
+---
 
-**1. Scan an Infrastructure Repository**
-Builds the dynamic infrastructure graph from code. Look for `docker-compose.yml`, `package.json`, `requirements.txt`, and Kubernetes `.yaml` manifests.
+## 🧪 Running the Unit Tests
+
+Chrona is backed by a robust test suite covering graph builder logic, service mappings, temporal decay algorithms, and secrets sanitizers.
+
+To install dev dependencies and run the tests:
 ```bash
-python -m chrona.cli.commands scan ../<your-repo-name>
+# Install test requirements
+pip install pytest pytest-cov
+
+# Run the test suite
+python -m pytest
 ```
 
-**2. Ask for RCA**
-Ask Chrona to find the root cause of an issue based on the graph it just built and historical incidents.
-```bash
-python -m chrona.cli.commands ask "checkout latency spike after deployment"
-```
+---
 
-**3. Visualize Dependency Path**
-If Chrona detects a path between two services, you can render an interactive HTML graph.
-```bash
-python -m chrona.cli.commands graph-path <source-service> <target-service> --visualize
-```
+## 🔒 Security & Privacy (PII Masking)
 
-**4. Run the Demo**
-Want to see how it works instantly? Point it at a test repo like Google's Microservices Demo.
-```bash
-python -m chrona.cli.commands demo --repo-path ../microservices-demo
-```
-
-## 🔒 Security & Privacy
-
-Chrona includes a **Sanitization Pipeline** that automatically redacts secrets, PII, and credentials from raw incident logs before they ever hit the Vector Store or LLM.
-
-## ⚠️ Current Limitations (MVP)
-
-As an MVP prototype, Chrona currently has the following known boundaries:
-
-1. **API Rate Limits:** The default setup uses Groq's free API tier. If you run the `demo` or `ask` commands too rapidly, you may hit the `429 Too Many Requests` rate limit. Wait a minute and try again.
-2. **Repository Size Constraints:** The tool works best on microservice architectures under 10,000 files. Very large monorepos may cause the AST parser to hit the local memory limit or graph serialization limit.
-3. **Supported Architectures:** The current `RepoScanner` natively parses Docker Compose (`docker-compose.yml`), Kubernetes manifests (`.yaml`), NPM (`package.json`), and Python (`requirements.txt`). Other frameworks (like Terraform, Go modules, or raw Maven) are not currently mapped into the graph.
-4. **Context Window:** If a query pulls in too many related incidents, the prompt may exceed the 8k/32k token limits of the selected LLM, causing a fallback response.
+Chrona integrates a strict SRE **Sanitization Pipeline**. Raw server logs, console tracebacks, and database records are fully sanitized of any credentials, email addresses, IP coordinates, and API keys before they hit local indexes or upstream generative models.
 
 ## 💡 Built With
-- **NetworkX & PyVis:** For complex graph manipulation and interactive rendering.
-- **Groq & Llama 3.3:** For fast RCA reasoning.
-- **Rich & Typer:** For the CLI interface.
+* **NetworkX & PyVis:** For dependency mapping, shortest path traversals, and physics-based network rendering.
+* **Scikit-Learn:** For local TF-IDF semantic indexes.
+* **Groq & Llama 3.3:** For lightning-fast generative RCA reasoning.
+* **Rich & Typer:** For a gorgeous, highly visual CLI terminal experience.
+
+---
+
+## ⚠️ Scope Boundaries & Operational Limits
+
+As a high-performance prototype, Chrona operates under a few engineering boundaries to be aware of:
+
+1. **API Rate Limiting (Groq Free Tier):** The default config runs on Groq's free versatile tier. If commands are invoked rapidly in succession, you may trigger standard `429 Too Many Requests` limits. Wait 60 seconds or switch to an OpenAI key inside `.env` to bypass this.
+2. **Repository Scale Constraints:** Chrona's repository AST scanner is optimized for microservice architectures under **10,000 files**. Parsing monorepos exceeding this scale may cause high local CPU spikes or NetworkX memory limits.
+3. **Supported Architectures:** The dependency extractor natively parses Kubernetes manifests (`.yaml`), Docker Compose (`docker-compose.yml`), Python (`requirements.txt`), and Node.js (`package.json`). Frameworks like Terraform, Go, or Java modules are currently outside the ingestion parser scope.
+4. **LLM Context Boundaries:** Extremely large historic incidents can exhaust the context window limits of standard models, triggering fallback responses. Keep incident logs truncated below 12k tokens.
