@@ -15,9 +15,13 @@ If your database migrated from standalone to a cluster 3 months ago, a standard 
 
 **Chrona solves this by implementing:**
 1. **Repository-Aware Infrastructure Graphs:** Automatically maps dependency topologies directly from your Kubernetes manifests and Docker Compose configurations using safe AST-aware loaders.
+
 2. **Temporal Decay Engine:** Algorithmically decays the confidence score of historical incident memories based on how much the underlying infrastructure has changed since the incident occurred.
+
 3. **Triple-Tier Hybrid Vector Store:** Pluggable semantic retrieval. Leverages OpenAI Cloud Embeddings, local `sentence-transformers` models, or a zero-dependency local TF-IDF backup.
+
 4. **Dynamic Cascadeflow Router:** Uses a weighted heuristic decision engine (evaluating severity, task complexity, confidence, and tokens) with built-in API cost estimators.
+
 5. **Zero-Dependency High-Fidelity Simulation:** Built-in offline SRE heuristic simulation that generates realistic root cause analyses even if API keys are missing.
 
 ---
@@ -259,6 +263,9 @@ Chrona integrates a strict SRE **Sanitization Pipeline**. Raw server logs, conso
 As a high-performance prototype, Chrona operates under a few engineering boundaries to be aware of:
 
 1. **API Rate Limiting (Groq Free Tier):** The default config runs on Groq's free versatile tier. If commands are invoked rapidly in succession, you may trigger standard `429 Too Many Requests` limits. Wait 60 seconds or switch to an OpenAI key inside `.env` to bypass this.
+
 2. **Repository Scale Constraints:** Chrona's repository AST scanner is optimized for microservice architectures under **10,000 files**. Parsing monorepos exceeding this scale may cause high local CPU spikes or NetworkX memory limits.
+
 3. **Supported Architectures:** The dependency extractor natively parses Kubernetes manifests (`.yaml`), Docker Compose (`docker-compose.yml`), Python (`requirements.txt`), and Node.js (`package.json`). Frameworks like Terraform, Go, or Java modules are currently outside the ingestion parser scope.
+
 4. **LLM Context Boundaries:** Extremely large historic incidents can exhaust the context window limits of standard models, triggering fallback responses. Keep incident logs truncated below 12k tokens.
