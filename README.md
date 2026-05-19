@@ -95,43 +95,31 @@ chrona/
 
 ## 🚀 Instant Setup & Zero-Key Demo (Under 1 Minute!)
 
-### 1️⃣ Prerequisite Configuration (Optional)
-If you want to use **live generative AI reasoning** instead of Chrona's zero-dependency **local simulation engine**, configure your environment variables first:
-👉 **See [Environment Setup](#⚙️-environment-setup) below** to set up your `.env` file before running the application.
+To configure API keys or telemetry parameters, please refer to the **[Environment Setup](#⚙️-environment-setup)** section below before running.
 
 ---
 
-### 2️⃣ Option A: Docker (Recommended)
-Run Chrona entirely inside a Docker container without installing local Python packages.
+### 🐳 Option A: Docker (Recommended)
+Run Chrona entirely inside a Docker container without installing local dependencies.
 
 * **Step 1: Build the Docker Image**
   ```bash
   docker build -t chrona .
   ```
 
-* **Step 2: Run Chrona**
-  * **With API Keys (Live Generative AI):**
-    Ensure you configured your `.env` file first, then run with the `--env-file` parameter:
-    ```bash
-    # Run the interactive SRE demo
-    docker run -it --env-file .env chrona demo
-
-    # Ask a custom incident query
-    docker run -it --env-file .env chrona ask "redis connection pool timeout in checkoutservice"
-    ```
+* **Step 2: Run the interactive demo**
   * **Without API Keys (Local Simulation Mode):**
-    No configuration needed. Automatically triggers high-fidelity offline heuristic simulations:
     ```bash
-    # Run the interactive SRE demo
     docker run -it chrona demo
-
-    # Ask a custom incident query
-    docker run -it chrona ask "redis connection pool timeout in checkoutservice"
+    ```
+  * **With API Keys (Live Generative Mode):**
+    ```bash
+    docker run -it --env-file .env chrona demo
     ```
 
 ---
 
-### 3️⃣ Option B: Local Python Installation
+### 🐍 Option B: Local Python Installation
 Requires Python 3.10+ installed on your host machine.
 
 * **Step 1: Install Dependencies**
@@ -144,25 +132,10 @@ Requires Python 3.10+ installed on your host machine.
   pip install -e .
   ```
 
-* **Step 2: Run Chrona**
-  * **With API Keys (Live Generative AI):**
-    Ensure you configured your `.env` file first. The local application will automatically load settings from your `.env` at runtime:
-    ```bash
-    # Run the interactive SRE demo
-    python -m chrona.cli.commands demo
-
-    # Ask a custom incident query
-    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
-    ```
-  * **Without API Keys (Local Simulation Mode):**
-    If no `.env` or system environment keys are defined, Chrona runs the local simulation engine:
-    ```bash
-    # Run the interactive SRE demo
-    python -m chrona.cli.commands demo
-
-    # Ask a custom incident query
-    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
-    ```
+* **Step 2: Run the interactive demo**
+  ```bash
+  python -m chrona.cli.commands demo
+  ```
 
 ---
 
@@ -191,67 +164,104 @@ docker run -it --env-file .env -v "$(pwd):/workspace" chrona demo
 All CLI commands follow this standard, high-level invocation pattern:
 
 * **Local Structure:** `python -m chrona.cli.commands <command> [arguments] [options]`
-* **Docker Structure:** `docker run -it [--env-file .env] chrona <command> [arguments] [options]`
+* **Docker Structure:** `docker run -it [--env-file .env] [-v "$(pwd):/workspace"] chrona <command> [arguments] [options]`
 
 ---
 
 ### 1. Scan a Target Codebase
 Scan any target folder to parse Kubernetes configurations, compose files, and dependency manifests to construct the infrastructure topology.
 
-* **General Structure:**
-  ```bash
-  python -m chrona.cli.commands scan <path-to-target-directory>
-  ```
+* **Local Python Command:**
+  * **General Structure:**
+    ```bash
+    python -m chrona.cli.commands scan <path-to-target-directory>
+    ```
+  * **Concrete Example:**
+    ```bash
+    python -m chrona.cli.commands scan ./my-microservice-repo
+    ```
 
-* **Concrete Example:**
-  ```bash
-  python -m chrona.cli.commands scan ./my-microservice-repo
-  ```
+* **Docker Container Command:**
+  * **General Structure:**
+    ```bash
+    docker run -it -v "<path-to-target-directory>:/workspace/target" chrona scan /workspace/target
+    ```
+  * **Concrete Example:**
+    ```bash
+    docker run -it -v "$(pwd)/my-microservice-repo:/workspace/target" chrona scan /workspace/target
+    ```
 
 ---
 
 ### 2. Analyze an Active Incident
 Query the dynamic topology graph, search previous incident histories, calculate decay penalties, and output an SRE Root Cause Analysis.
 
-* **General Structure:**
-  ```bash
-  python -m chrona.cli.commands ask "<incident-description>"
-  ```
+* **Live Generative AI Mode (With API Keys):**
+  Requires `.env` file to be configured first.
+  * **Local Python:**
+    ```bash
+    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
+    ```
+  * **Docker:**
+    ```bash
+    docker run -it --env-file .env chrona ask "redis connection pool timeout in checkoutservice"
+    ```
 
-* **Concrete Example:**
-  ```bash
-  python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
-  ```
+* **Local Simulation Mode (Without API Keys):**
+  Runs offline SRE Symmetrical simulation instantly without keys.
+  * **Local Python:**
+    ```bash
+    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
+    ```
+  * **Docker:**
+    ```bash
+    docker run -it chrona ask "redis connection pool timeout in checkoutservice"
+    ```
 
 ---
 
 ### 3. Visualize a Dependency Path
 Traverse the causal dependency topology between two active nodes and compile a physics-based, dynamic visual NetworkX graph locally.
 
-* **General Structure:**
-  ```bash
-  python -m chrona.cli.commands graph-path <source-service> <target-service> --visualize
-  ```
+* **Local Python Command:**
+  * **General Structure:**
+    ```bash
+    python -m chrona.cli.commands graph-path <source-service> <target-service> --visualize
+    ```
+  * **Concrete Example:**
+    ```bash
+    python -m chrona.cli.commands graph-path service:checkoutservice service:redis-cart --visualize
+    ```
 
-* **Concrete Example:**
-  ```bash
-  python -m chrona.cli.commands graph-path service:checkoutservice service:redis-cart --visualize
-  ```
+* **Docker Container Command:**
+  * **General Structure:**
+    ```bash
+    docker run -it -v "$(pwd):/app" chrona graph-path <source-service> <target-service> --visualize
+    ```
+  * **Concrete Example:**
+    ```bash
+    docker run -it -v "$(pwd):/app" chrona graph-path service:checkoutservice service:redis-cart --visualize
+    ```
 
 ---
 
 ### 4. Inspect Model Routing Statistics
 Display full auditing and diagnostic logs detailing Cascadeflow router tier performance, total token workloads, and dynamic API cost savings.
 
-* **General Structure:**
+* **Local Python Command:**
   ```bash
   python -m chrona.cli.commands route-stats
   ```
 
-* **Concrete Example:**
-  ```bash
-  python -m chrona.cli.commands route-stats
-  ```
+* **Docker Container Command:**
+  * **With API Keys:**
+    ```bash
+    docker run -it --env-file .env chrona route-stats
+    ```
+  * **Without API Keys:**
+    ```bash
+    docker run -it chrona route-stats
+    ```
 
 ---
 
