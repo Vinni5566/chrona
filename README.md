@@ -147,7 +147,9 @@ To connect Chrona to live generative LLMs (like Groq or OpenAI) and enable cloud
 cp .env.example .env
 ```
 
-Open `.env` and set your API keys (e.g. `GROQ_API_KEY` for live generative reasoning or `OPENAI_API_KEY` for vector embeddings). All settings are pre-configured to run out-of-the-box!
+* **LLM Integration:** Set your `GROQ_API_KEY` (for fast Llama-based reasoning) or `OPENAI_API_KEY` (for cloud embeddings). All settings are pre-configured to run out-of-the-box!
+
+* **Cloud Telemetry (Optional):** To enable remote SRE tracing and logging on the Hindsight platform, populate the `HINDSIGHT_API_KEY`, `HINDSIGHT_PROJECT_ID`, and `HINDSIGHT_BASE_URL` fields inside `.env`.
 
 To run with your `.env` file in Docker:
 ```bash
@@ -158,31 +160,70 @@ docker run -it --env-file .env -v "$(pwd):/workspace" chrona demo
 
 ## 🛠️ Complete CLI Command Reference
 
-Once installed, use the following commands to scan codebases and analyze incidents:
+All CLI commands follow this standard, high-level invocation pattern:
+
+* **Local Structure:** `python -m chrona.cli.commands <command> [arguments] [options]`
+* **Docker Structure:** `docker run -it [--env-file .env] chrona <command> [arguments] [options]`
+
+---
 
 ### 1. Scan a Target Codebase
-Point the scanner to any local directory. It will scan for Kubernetes `.yaml` files, `docker-compose.yml`, `package.json`, and `requirements.txt` to index dependencies and infrastructure topology.
-```bash
-python -m chrona.cli.commands scan <path-to-your-target-repo>
-```
+Scan any target folder to parse Kubernetes configurations, compose files, and dependency manifests to construct the infrastructure topology.
+
+* **General Structure:**
+  ```bash
+  python -m chrona.cli.commands scan <path-to-target-directory>
+  ```
+
+* **Concrete Example:**
+  ```bash
+  python -m chrona.cli.commands scan ./my-microservice-repo
+  ```
+
+---
 
 ### 2. Analyze an Active Incident
-Retrieve historical incident memories, apply temporal decay penalties, query the topology graph for causal routes, and generate SRE root cause analyses.
-```bash
-python -m chrona.cli.commands ask "database write latency spike upstream"
-```
+Query the dynamic topology graph, search previous incident histories, calculate decay penalties, and output an SRE Root Cause Analysis.
+
+* **General Structure:**
+  ```bash
+  python -m chrona.cli.commands ask "<incident-description>"
+  ```
+
+* **Concrete Example:**
+  ```bash
+  python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
+  ```
+
+---
 
 ### 3. Visualize a Dependency Path
-If Chrona detects a causal topology route between two services, generate and view an interactive, physics-based NetworkX HTML visualization locally.
-```bash
-python -m chrona.cli.commands graph-path source-service target-service --visualize
-```
+Traverse the causal dependency topology between two active nodes and compile a physics-based, dynamic visual NetworkX graph locally.
+
+* **General Structure:**
+  ```bash
+  python -m chrona.cli.commands graph-path <source-service> <target-service> --visualize
+  ```
+
+* **Concrete Example:**
+  ```bash
+  python -m chrona.cli.commands graph-path service:checkoutservice service:redis-cart --visualize
+  ```
+
+---
 
 ### 4. Inspect Model Routing Statistics
-Display audit statistics detailing Cascadeflow Router savings, model usage frequencies, and total estimated tokens.
-```bash
-python -m chrona.cli.commands route-stats
-```
+Display full auditing and diagnostic logs detailing Cascadeflow router tier performance, total token workloads, and dynamic API cost savings.
+
+* **General Structure:**
+  ```bash
+  python -m chrona.cli.commands route-stats
+  ```
+
+* **Concrete Example:**
+  ```bash
+  python -m chrona.cli.commands route-stats
+  ```
 
 ---
 
