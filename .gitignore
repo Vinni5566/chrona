@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+data/graph/*
+data/memories/*
+data/incidents/*
+data/audit/*
+!data/**/.gitkeep
