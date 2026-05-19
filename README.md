@@ -95,67 +95,74 @@ chrona/
 
 ## 🚀 Instant Setup & Zero-Key Demo (Under 1 Minute!)
 
-You do **not** need an API key to experience Chrona's full capabilities! If no keys are configured, the CLI will automatically activate its **High-Fidelity Local Simulation Engine** to show a highly realistic offline interactive demo.
-
-### 🐳 Option A: Docker (Recommended)
-You can run Chrona entirely inside a Docker container without installing any local Python dependencies.
-
-1. **(Optional) Setup API Keys:**
-   If you want to use live generative AI instead of the high-fidelity offline simulation:
-   ```bash
-   cp .env.example .env
-   # Open .env and add your credentials (e.g. GROQ_API_KEY)
-   ```
-
-2. **Build the Docker Image:**
-   ```bash
-   docker build -t chrona .
-   ```
-
-3. **Run the Interactive Demo:**
-   * **With API Keys:**
-     ```bash
-     docker run -it --env-file .env chrona demo
-     ```
-   * **Offline / Simulation Mode:**
-     ```bash
-     docker run -it chrona demo
-     ```
-
-4. **Ask custom incident queries:**
-   * **With API Keys:**
-     ```bash
-     docker run -it --env-file .env chrona ask "redis connection pool timeout in checkoutservice"
-     ```
-   * **Offline / Simulation Mode:**
-     ```bash
-     docker run -it chrona ask "redis connection pool timeout in checkoutservice"
-     ```
+### 1️⃣ Prerequisite Configuration (Optional)
+If you want to use **live generative AI reasoning** instead of Chrona's zero-dependency **local simulation engine**, configure your environment variables first:
+👉 **See [Environment Setup](#⚙️-environment-setup) below** to set up your `.env` file before running the application.
 
 ---
 
-### 🐍 Option B: Local Python Installation
-If you prefer running Chrona directly on your host machine:
+### 2️⃣ Option A: Docker (Recommended)
+Run Chrona entirely inside a Docker container without installing local Python packages.
 
-1. **Clone and Install Dependencies:**
-   ```bash
-   # Create and activate a virtualenv (optional but recommended)
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   
-   # Install dependencies
-   pip install -e .
-   ```
+* **Step 1: Build the Docker Image**
+  ```bash
+  docker build -t chrona .
+  ```
 
-2. **Run the Interactive Demo:**
-   ```bash
-   python -m chrona.cli.commands demo
-   ```
+* **Step 2: Run Chrona**
+  * **With API Keys (Live Generative AI):**
+    Ensure you configured your `.env` file first, then run with the `--env-file` parameter:
+    ```bash
+    # Run the interactive SRE demo
+    docker run -it --env-file .env chrona demo
 
-3. **Ask custom incident queries:**
-   ```bash
-   python -m chrona.cli.commands ask "checkout payment gateway timeout"
-   ```
+    # Ask a custom incident query
+    docker run -it --env-file .env chrona ask "redis connection pool timeout in checkoutservice"
+    ```
+  * **Without API Keys (Local Simulation Mode):**
+    No configuration needed. Automatically triggers high-fidelity offline heuristic simulations:
+    ```bash
+    # Run the interactive SRE demo
+    docker run -it chrona demo
+
+    # Ask a custom incident query
+    docker run -it chrona ask "redis connection pool timeout in checkoutservice"
+    ```
+
+---
+
+### 3️⃣ Option B: Local Python Installation
+Requires Python 3.10+ installed on your host machine.
+
+* **Step 1: Install Dependencies**
+  ```bash
+  # Optional: Create and activate virtualenv
+  python -m venv .venv
+  source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+  # Install package in editable mode
+  pip install -e .
+  ```
+
+* **Step 2: Run Chrona**
+  * **With API Keys (Live Generative AI):**
+    Ensure you configured your `.env` file first. The local application will automatically load settings from your `.env` at runtime:
+    ```bash
+    # Run the interactive SRE demo
+    python -m chrona.cli.commands demo
+
+    # Ask a custom incident query
+    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
+    ```
+  * **Without API Keys (Local Simulation Mode):**
+    If no `.env` or system environment keys are defined, Chrona runs the local simulation engine:
+    ```bash
+    # Run the interactive SRE demo
+    python -m chrona.cli.commands demo
+
+    # Ask a custom incident query
+    python -m chrona.cli.commands ask "redis connection pool timeout in checkoutservice"
+    ```
 
 ---
 
